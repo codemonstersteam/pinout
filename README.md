@@ -68,8 +68,8 @@
 |---|---|---|---|
 | **pinout** | Зонтичный концепт-репозиторий: модель контракта, обоснование, верхнеуровневый бэклог экосистемы | 🚧 концепт | [codemonstersteam/pinout](https://github.com/codemonstersteam/pinout) |
 | **pinout-asyncapi** | Валидатор контрактов AsyncAPI 3.0 между consumer и provider. Request-Reply, Fire-and-Forget, Pub-Sub. CLI для CI/CD | ✅ работает | [codemonstersteam/pinout-asyncapi](https://github.com/codemonstersteam/pinout-asyncapi) |
-| **pinout-openapi** | Валидатор синхронных контрактов: чистая функция сравнения OpenAPI потребителя и master-OpenAPI поставщика (операции, схемы request/response, коды), симметрично `pinout-asyncapi`. Семантику использования контракта закрывают компонентные тесты потребителя (стаб и сценарии из спеки поставщика) | 📋 проектируется | — |
-| **pinout-netlist** | Координатор связей: хранит граф consumer↔provider, версии и метаданные контрактов, принимает отчёты валидаторов, детектирует breaking-change во времени. Название — отсылка к netlist в PCB-дизайне | 📋 запланирован | — |
+| **pinout-openapi** | Валидатор синхронных контрактов: чистая функция сравнения OpenAPI потребителя и master-OpenAPI поставщика (операции, схемы request/response, коды), симметрично `pinout-asyncapi`. Семантику использования контракта закрывают компонентные тесты потребителя (стаб и сценарии из спеки поставщика) | 📋 проектируется | [codemonstersteam/pinout-openapi](https://github.com/codemonstersteam/pinout-openapi) |
+| **pinout-netlist** | Координатор связей: хранит граф consumer↔provider, версии и метаданные контрактов, принимает отчёты валидаторов, детектирует breaking-change во времени. Название — отсылка к netlist в PCB-дизайне | 📋 запланирован | [codemonstersteam/pinout-netlist](https://github.com/codemonstersteam/pinout-netlist) |
 | **pinout-cli** | Единый CLI-фронт для всех валидаторов и работы с координатором | 📋 позже | — |
 
 ### Что именно делает pinout-openapi
