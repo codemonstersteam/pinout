@@ -28,6 +28,32 @@
 
 Конфигурация пары едина для обоих модулей — файл `contract-tests.yaml` (путь/URL к спеке потребителя, путь/URL к master-спеке поставщика, перечень используемых потребителем каналов/операций).
 
+### Карта экосистемы (C4 — System Context)
+
+```mermaid
+C4Context
+    title Экосистема pinout — модель контракта consumer↔provider
+    Person(ci, "CI / разработчик", "запускает валидацию на pre-merge")
+
+    System_Boundary(pinout, "pinout") {
+        System(openapi, "pinout-openapi", "валидатор синхронных контрактов (OpenAPI)")
+        System(asyncapi, "pinout-asyncapi", "валидатор асинхронных контрактов (AsyncAPI)")
+        System(netlist, "pinout-netlist", "граф consumer↔provider, приём отчётов, breaking-change")
+    }
+
+    System_Ext(consumer, "Сервис-потребитель", "спека потребителя в Git")
+    System_Ext(provider, "Сервис-поставщик", "master-спека = прод, в Git")
+
+    Rel(ci, openapi, "validate (sync)")
+    Rel(ci, asyncapi, "validate (async)")
+    Rel(openapi, consumer, "читает спеку потребителя")
+    Rel(openapi, provider, "читает master-спеку")
+    Rel(asyncapi, consumer, "читает спеку потребителя")
+    Rel(asyncapi, provider, "читает master-спеку")
+    Rel(openapi, netlist, "JSON-отчёт (канон)")
+    Rel(asyncapi, netlist, "JSON-отчёт (канон)")
+```
+
 ## Обоснование: почему спека-в-Git, а не сгенерированные библиотеки
 
 ### Несущий инвариант экосистемы
