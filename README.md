@@ -28,6 +28,32 @@
 
 Конфигурация пары едина для обоих модулей — файл `contract-tests.yaml` (путь/URL к спеке потребителя, путь/URL к master-спеке поставщика, перечень используемых потребителем каналов/операций).
 
+### Карта экосистемы (C4 — System Context)
+
+```mermaid
+C4Context
+    title Экосистема pinout — модель контракта consumer↔provider
+    Person(ci, "CI / разработчик", "запускает валидацию на pre-merge")
+
+    System_Boundary(pinout, "pinout") {
+        System(openapi, "pinout-openapi", "валидатор синхронных контрактов (OpenAPI)")
+        System(asyncapi, "pinout-asyncapi", "валидатор асинхронных контрактов (AsyncAPI)")
+        System(netlist, "pinout-netlist", "граф consumer↔provider, приём отчётов, breaking-change")
+    }
+
+    System_Ext(consumer, "Сервис-потребитель", "спека потребителя в Git")
+    System_Ext(provider, "Сервис-поставщик", "master-спека = прод, в Git")
+
+    Rel(ci, openapi, "validate (sync)")
+    Rel(ci, asyncapi, "validate (async)")
+    Rel(openapi, consumer, "читает спеку потребителя")
+    Rel(openapi, provider, "читает master-спеку")
+    Rel(asyncapi, consumer, "читает спеку потребителя")
+    Rel(asyncapi, provider, "читает master-спеку")
+    Rel(openapi, netlist, "JSON-отчёт (канон)")
+    Rel(asyncapi, netlist, "JSON-отчёт (канон)")
+```
+
 ## Обоснование: почему спека-в-Git, а не сгенерированные библиотеки
 
 ### Несущий инвариант экосистемы
@@ -68,8 +94,8 @@
 |---|---|---|---|
 | **pinout** | Зонтичный концепт-репозиторий: модель контракта, обоснование, верхнеуровневый бэклог экосистемы | 🚧 концепт | [codemonstersteam/pinout](https://github.com/codemonstersteam/pinout) |
 | **pinout-asyncapi** | Валидатор контрактов AsyncAPI 3.0 между consumer и provider. Request-Reply, Fire-and-Forget, Pub-Sub. CLI для CI/CD | ✅ работает | [codemonstersteam/pinout-asyncapi](https://github.com/codemonstersteam/pinout-asyncapi) |
-| **pinout-openapi** | Валидатор синхронных контрактов: чистая функция сравнения OpenAPI потребителя и master-OpenAPI поставщика (операции, схемы request/response, коды), симметрично `pinout-asyncapi`. Семантику использования контракта закрывают компонентные тесты потребителя (стаб и сценарии из спеки поставщика) | 📋 проектируется | — |
-| **pinout-netlist** | Координатор связей: хранит граф consumer↔provider, версии и метаданные контрактов, принимает отчёты валидаторов, детектирует breaking-change во времени. Название — отсылка к netlist в PCB-дизайне | 📋 запланирован | — |
+| **pinout-openapi** | Валидатор синхронных контрактов: чистая функция сравнения OpenAPI потребителя и master-OpenAPI поставщика (операции, схемы request/response, коды), симметрично `pinout-asyncapi`. Семантику использования контракта закрывают компонентные тесты потребителя (стаб и сценарии из спеки поставщика) | 📋 проектируется | [codemonstersteam/pinout-openapi](https://github.com/codemonstersteam/pinout-openapi) |
+| **pinout-netlist** | Координатор связей: хранит граф consumer↔provider, версии и метаданные контрактов, принимает отчёты валидаторов, детектирует breaking-change во времени. Название — отсылка к netlist в PCB-дизайне | 📋 запланирован | [codemonstersteam/pinout-netlist](https://github.com/codemonstersteam/pinout-netlist) |
 | **pinout-cli** | Единый CLI-фронт для всех валидаторов и работы с координатором | 📋 позже | — |
 
 ### Что именно делает pinout-openapi

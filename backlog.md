@@ -36,18 +36,20 @@ E1 pinout-openapi: чистая функция валидации ────�
 
 ## E1 — pinout-openapi: чистая функция валидации соответствия контрактов (MVP)
 
-**Статус:** 📋 проектирование завершено (этап 2): репозиторий создан, пакет `docs/design/contract-validate/` готов, ждёт handoff-аппрува. Решения оператора: парсер `kin-openapi`; канон формата отчёта определён здесь; поставщик `spec_url`+`spec_path`.
+**Статус:** 📋 проектирование завершено (этап 2): репозиторий создан, пакет `docs/design/contract-validate/` готов. Ревью планировщика выявило разрывы консеквента, закрываемые **до** handoff (см. ниже). После их закрытия — handoff-аппрув → `program-implementation`.
+**Зафиксированные решения:** парсер `kin-openapi`; канон формата отчёта определён здесь ([report-format.md](../pinout-openapi/docs/report-format.md)); `SpecRef = spec_path | spec_url` (master = прод); словарь `ValidationError`; exit codes `0/1/2/3`; срез один — `validate-contract` (CLI `validate <config>`).
 **Цель:** MVP по `intent.md` — функция сравнения OpenAPI потребителя и master-OpenAPI поставщика, симметрично async по конфигурации (`contract-tests.yaml`) и выходу.
 **Репозиторий:** новый `pinout-openapi` (рядом с async). Скиллы — из `service-template`.
 
 Объём MVP (валидация одной пары операций):
-- [ ] Парсер OpenAPI 3.x (или зрелая библиотека — honest reuse) в рабочую структуру.
+- [ ] Парсер OpenAPI 3.x — **`kin-openapi`** (honest reuse); все `$ref` резолвятся на IO-границе (`SpecClient.Fetch`), логика сравнения работает на развёрнутых схемах.
 - [ ] Конфиг `contract-tests.yaml`, симметричный async (consumer spec_path, provider spec_url=master, перечень используемых операций).
 - [ ] Чистая функция: для операции потребителя найти операцию поставщика (path+method), сверить request (потребитель ⊆ принимает поставщик), response (поставщик ⊇ ожидает потребитель), коды и content-type.
-- [ ] Единый `ValidationError` + JSON-отчёт в общем формате (см. E0).
-- [ ] CLI `validate contract-tests.yaml` + exit codes, как в async.
+- [ ] Единый `ValidationError` + сериализация `Report` → канонический JSON (`validator`/`interaction`/`spec_ref`/`version`/`generated_at`), формат общий (см. E0).
+- [ ] CLI `validate contract-tests.yaml` + exit codes `0/1/2/3`, как в async.
 
 **Артефакты проектирования (skill `program-design`, этап 2):** `docs/design/contract-validate/` — `intent.md`, `slices.md`, `messages.md`, `slices/01-…`, `contracts-graph.md`, `backlog.md` с handoff-чеклистом.
+**Разрывы к закрытию до handoff (ревью планировщика):** граница `$ref`/IO; шаг DTO `Report`→канон + `generated_at`/`version`; инъекция clock; режим отказа на стороне потребителя (операция из конфига отсутствует в спеке потребителя); точные юнит-N по подфункциям сравнения; явный out-of-scope `compareSchemas` (`allOf/oneOf/anyOf`, enum-сужение, format).
 **DoD MVP:** пара совместима/несовместима определяется корректно; компонентные тесты CLI зелёные; отчёт в общем формате; README по скиллу `documentation`.
 
 ## E2 — pinout-netlist: координатор графа и детект breaking-change
@@ -78,6 +80,7 @@ E1 pinout-openapi: чистая функция валидации ────�
 **Статус:** 📋 методология, параллельно. **Upstream-репозиторий** [service-template](https://github.com/ubik-life/service-template/).
 **Цель:** доработать существующий скилл `component-tests` так, чтобы у потребителя сценарии **и** заглушки выводились из master-спеки поставщика, на контракт которого он опирается.
 
+- [ ] **Доработать скилл проектирования И реализации компонентных тестов** так, чтобы сценарии и заглушки выводились из спеки поставщика **и** из `contract-tests.yaml` (перечень используемых потребителем операций path+method = объём генерации).
 - [ ] Расширить процедуру: вход — спека поставщика; happy path + сценарий на каждый обещанный контрактом режим отказа.
 - [ ] Конвенция генерации contract-true заглушек из master-OpenAPI поставщика.
 - [ ] Изоляция фикстур по slice сохраняется (без скрытой связности).
@@ -92,3 +95,4 @@ E1 pinout-openapi: чистая функция валидации ────�
 - [x] Этап 1 — верхнеуровневый бэклог экосистемы (этот файл).
 - [x] Этап 2 — репозиторий `pinout-openapi`: ссылки на скиллы `service-template` + пакет проектирования `program-design` + канон формата отчёта.
 - [x] Этап 3 — репозиторий `pinout-netlist` (каркас + проектирование) + план доработки `pinout-asyncapi` ([integration-netlist.md](../pinout-asyncapi/docs/integration-netlist.md)).
+- [ ] Этап 4 — закрытие разрывов проектирования E1 по ревью планировщика → handoff-аппрув → реализация (`program-implementation`).
