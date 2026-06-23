@@ -48,7 +48,7 @@ E1 pinout-openapi: чистая функция валидации ────�
 - [ ] Единый `ValidationError` + сериализация `Report` → канонический JSON (`validator`/`interaction`/`spec_ref`/`version`/`generated_at`), формат общий (см. E0).
 - [ ] CLI `validate contract-tests.yaml` + exit codes `0/1/2/3`, как в async.
 
-**Артефакты проектирования (skill `program-design`, этап 2):** `docs/design/contract-validate/` — `intent.md`, `slices.md`, `messages.md`, `slices/01-…`, `contracts-graph.md`, `backlog.md` с handoff-чеклистом.
+**Артефакты проектирования (skill `program-design`, этап 2):** `docs/design/contract-validate/` — `intent.md`, `slices.md`, `messages.md`, `slices/01-…`, `contracts-graph.md`, `ref-handling.md`, `c4.md` (C2/C3 + use case по Коберну), `impl-brief-01.md`, `backlog.md` с handoff-чеклистом; `docs/risk-coverage.md`; `devlog/`. C4-контекст экосистемы (C1) — в этом репозитории (README, раздел «Модель контракта»).
 **Разрывы к закрытию до handoff (ревью планировщика):** граница `$ref`/IO; шаг DTO `Report`→канон + `generated_at`/`version`; инъекция clock; режим отказа на стороне потребителя (операция из конфига отсутствует в спеке потребителя); точные юнит-N по подфункциям сравнения; явный out-of-scope `compareSchemas` (`allOf/oneOf/anyOf`, enum-сужение, format).
 **DoD MVP:** пара совместима/несовместима определяется корректно; компонентные тесты CLI зелёные; отчёт в общем формате; README по скиллу `documentation`.
 
