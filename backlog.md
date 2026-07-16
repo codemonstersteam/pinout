@@ -26,13 +26,14 @@
 E-harness  скилл component-tests: стаб+consumed-contract из спеки + гейт  ── методология, параллельно
            │ (даёт вход consumed-contract для валидаторов)
            ▼
-E1 pinout-openapi  (forward, sync)  ─┐
-E0 pinout-asyncapi (forward, async) ─┼──► общий формат отчёта ──► E2 pinout-netlist (граф + provenance + reverse)
-                                     └──────────────────────────► E3 pinout-cli (единый фронт)
+E1 pinout-openapi  (forward, sync)  ─┐  🔴 канон docs/report-format.md (владелец E1) ─┐
+E0 pinout-asyncapi (forward, async) ─┼──► общий формат отчёта ────────────────────────┼─► E2 pinout-netlist (граф + provenance + reverse)
+                                     └──────────────────────────────────────────────────► E3 pinout-cli (единый фронт)
 ```
 
 **Порядок:** `E-harness` (даёт consumed-contract) ∥ `E1`/`E0` (валидаторы forward, фиксируют общий отчёт) →
 `E2` (граф + reverse) → `E3` (фронт). E1 и E0 — симметричные независимые конвейеры на одной модели.
+**Блокер:** канон `docs/report-format.md` (в E1) — предпосылка для отчётной части E0 и для E2; сейчас снесён (битые ссылки).
 
 ---
 
@@ -58,25 +59,42 @@ E0 pinout-asyncapi (forward, async) ─┼──► общий формат от
 **Цель:** статическая сверка `consumed-contract` потребителя ↳ схема master-OpenAPI поставщика (bi-directional), симметрично async по конфигу и выходу.
 **Репозиторий:** `../pinout-openapi`.
 
+> Алгоритм сверки **зафиксирован песочницей** [`../pinout-openapi/sandbox/`](../pinout-openapi/sandbox/) (`ALGORITHM.md` +
+> доказательство `EXPERIMENT.md`, 5/5): ядро — `requires ⊆ sends` (запрос) + `reads ⊆ provides` (ответ) + типы.
+> E1 переносит его на Go, а не переизобретает.
+
+- [ ] 🔴 **Канон отчёта — `docs/report-format.md`** (validator / interaction / consumer / provider / `verdicts[].subject` / `errors[]` / provenance / `schema_version`). Владелец канона — pinout-openapi. **БЛОКИРУЕТ E0 и E2:** файл снесён при reset, на него висят 10 битых ссылок (async `integration-netlist.md` ×2; netlist `README`/`AGENTS`/`openapi.yml`/`docs/design` ×6). Восстановить/написать **до старта E0/E2**.
 - [ ] Парсер OpenAPI 3.x — **`kin-openapi`** (honest reuse): parse + `$ref`-резолв + валидация; instance/schema-валидация (`openapi3filter`).
 - [ ] Конфиг `contract-tests.yaml` (consumer, provider `spec_url|spec_path` = master, перечень операций), симметричный async.
 - [ ] Вход **`consumed-contract`** потребителя (из E-harness); резолв операций у поставщика (нет → `OP_NOT_IN_PROVIDER`).
-- [ ] **Сверка schema-vs-schema** per операция: request контравар. (поставщик принимает то, что потребитель шлёт), response ковар. (потребитель читает лишь то, что поставщик отдаёт). Глубина — от валидации схемы.
-- [ ] Единый `ValidationError` + `Report` → канон-JSON (общий формат, см. E0); CLI `validate <config>` + exit `0/1/2/3`.
+- [ ] **Сверка schema-vs-schema** per операция (перенос алгоритма песочницы на Go): request контравар. (поставщик принимает то, что потребитель шлёт), response ковар. (потребитель читает лишь то, что поставщик отдаёт). Глубина — от валидации схемы.
+- [ ] Единый `ValidationError` + `Report` → канон-JSON (см. пункт «Канон отчёта» выше); CLI `validate <config>` + exit `0/1/2/3`.
 
-**DoD:** пара совместима/несовместима определяется корректно (вкл. type-drift/вложенность); компонентные тесты CLI зелёные; отчёт в общем формате; README по скиллу `documentation` (с pipe-описанием).
+**DoD:** пара совместима/несовместима определяется корректно (вкл. type-drift/вложенность); компонентные тесты CLI зелёные; `docs/report-format.md` написан, отчёт в этом формате; README по скиллу `documentation` (с pipe-описанием).
 
 ## E0 — pinout-asyncapi: forward-валидатор (async) + отчёт под netlist
 
-**Статус:** ✅ инструмент работает; доработка под общую модель + экосистему.
-**Цель:** привести async-валидатор к той же модели (`consumed-contract` ↳ схема, provenance) и к общему формату отчёта, который потребляет netlist.
-**Репозиторий:** `../pinout-asyncapi`. План: [`pinout-asyncapi/docs/integration-netlist.md`](../pinout-asyncapi/docs/integration-netlist.md).
+**Статус:** ✅ инструмент работает; доработка в два под-скоупа (scope зафиксирован).
+**Репозиторий:** `../pinout-asyncapi`. План отчёта: [`pinout-asyncapi/docs/integration-netlist.md`](../pinout-asyncapi/docs/integration-netlist.md).
 
-- [ ] Выровнять по согласованной модели: `consumed-contract` каналов/сообщений потребителя ↳ схема payload поставщика (send контравар. / receive ковар.).
-- [ ] Привести `compatibility_report.json` к общему канон-формату (см. E1) + provenance.
+> **Scope (решение):** E0 **сейчас = ТОЛЬКО слой отчёта** — алгоритм валидации каналов/сообщений НЕ трогаем
+> (так и записано в `integration-netlist.md`). Модель-алайнмент (consumed-contract, README на новую модель) —
+> **отдельный под-эпик `E0-model`, ПОСЛЕ канона отчёта** (E1 `docs/report-format.md`). Так дешевле: инструмент
+> уже работает, а перевод модели — самостоятельный заход.
+
+**E0 (сейчас — отчёт под netlist):** зависит от E1 `docs/report-format.md`.
+- [ ] Привести `compatibility_report.json` к общему канон-формату (см. E1 «Канон отчёта») + provenance; маппер + тест.
 - [ ] Команда/флаг выгрузки отчёта для netlist; не ломать текущий CLI/exit codes.
+- [ ] Отметить в README async раздел «формат отчёта» со ссылкой на канон.
 
-**DoD:** async-валидатор на общей модели, отдаёт отчёт в общем формате; зелёный CI; описано в README.
+**DoD (E0):** async-валидатор отдаёт отчёт в канон-формате (`schema_version` совпал с openapi); текущий CLI/exit codes целы; зелёный CI; маппинг покрыт тестами.
+
+**E0-model (позже — выравнивание модели):** отдельный заход после E0.
+- [ ] Завести **`pinout-asyncapi/TASK.md`** (БТ, симметрично `openapi/TASK.md`) — вход для харнеса izi.
+- [ ] Выровнять по согласованной модели: `consumed-contract` каналов/сообщений потребителя ↳ схема payload поставщика (send контравар. / receive ковар.), provenance.
+- [ ] Привести README async с двух-спек модели («спека потребителя ↔ спека поставщика») на новую (consumed-contract, провайдер-как-истина).
+
+**DoD (E0-model):** async на общей модели (`consumed-contract`); README отражает новую модель; согласовано с §CONCEPT; зелёный CI.
 
 ## E2 — pinout-netlist: граф, provenance, reverse (breaking-change во времени)
 
