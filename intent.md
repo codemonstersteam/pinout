@@ -1,3 +1,7 @@
+> Исходный лог идеи. Уточнённая и обоснованная парадигма (consumed-contract, provenance, bi-directional,
+> schema-vs-schema) — в [`docs/CONCEPT.md`](docs/CONCEPT.md). Эта идея (стаб ↳ спека поставщика) осталась
+> верной; дрейф в «сравнение двух полных спек» был только в промежуточной формулировке README — исправлен.
+
 Идея:
 пишем инструмент, который по компонентным тестам потребителя
 проверяет, что потребитель использует заглушки
@@ -22,7 +26,7 @@ https://github.com/codemonstersteam/pinout-asyncapi/blob/main/contract-tests.yam
 нужно будет создать репу с планом и скиллами для 
 pinout-openapi
 pinout-netlist
-скиллы документации, проектирования и разработки бери в репе https://github.com/ubik-life/service-template/
+разработку ведёт харнес izi (https://github.com/codemonstersteam/rationaldev-ai-sdlc-skills) — его скиллы документации, проектирования и разработки
 
 План нужно провалидировать со мной
 на выходе:
