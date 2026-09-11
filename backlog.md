@@ -100,10 +100,11 @@ E0 pinout-asyncapi (forward, async) ─┼──► общий формат от
 > отчёта** (решение оператора), а под-эпик `E0-model` растворён: репозиторий строится на новой модели с нуля,
 > выравнивать нечего.
 
-**P1b долга — до старта харнес-прогона E0** (сейчас правится только спека; после старта та же правка задевает написанный код и тесты). Тикет-вход: `../pinout-asyncapi/debt/01-report-canon-1.1.md`:
-- [ ] 🔴 `api-specification/report.schema.json` → `1.1` зеркально sync-близнецу; `uncovered_channels` остаётся.
-- [ ] 🔴 Снять `x-canon-note` → ссылка на канон; актуализировать `docs/concept.md:330`, `TASK.md:102`, `TASK.md:198`.
-- [ ] 🔴 Проверить `consumer.name` в `config.schema.json`, добавить при отсутствии.
+**P1b долга — ✅ ВЫПОЛНЕНО 2026-07-25** (`pinout-asyncapi@rework-with-harnes`), успели до старта прогона E0, поэтому свелось к правке спеки. Разбор и детали: [`debt/report-canon-fork.md`](debt/report-canon-fork.md) → P1b. Тикет-вход удалён — поглощён постановкой асинка.
+- [x] 🔴 `api-specification/report.schema.json` → `1.1` зеркально sync-близнецу; `uncovered_channels` остаётся.
+- [x] 🔴 Снять `x-canon-note` → ссылка на канон; актуализировать `docs/concept.md` (D5), `TASK.md` (п. 8, внешние зависимости).
+- [x] 🔴 Проверить `consumer.name` в `config.schema.json` — уже был и required.
+- [x] 🔴 Сверх плана: ADR **D10** (шов часов для `generated_at`) и **D11** (`subject` у io/parse-ошибок) — обе формы обязаны совпасть у sync-близнеца в P1a.
 
 **E0 (реализация валидатора):** зависит от P0 долга (канон) и P1b.
 - [ ] Прогон харнеса izi по `TASK.md`: слайсы → use case → дизайн-пакет → тикеты → реализация.
