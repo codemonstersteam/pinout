@@ -75,8 +75,8 @@ C4Context
 |---|---|---|---|
 | **pinout** | Зонтичный концепт-репозиторий: модель контракта, обоснование, верхнеуровневый бэклог экосистемы | 🚧 концепт | [codemonstersteam/pinout](https://github.com/codemonstersteam/pinout) |
 | **pinout-asyncapi** | Валидатор контрактов AsyncAPI 3.0 между consumer и provider. Request-Reply, Fire-and-Forget, Pub-Sub. CLI для CI/CD | ✅ работает | [codemonstersteam/pinout-asyncapi](https://github.com/codemonstersteam/pinout-asyncapi) |
-| **pinout-openapi** | Валидатор синхронных контрактов (bi-directional): статическая сверка `consumed-contract` потребителя (авто из стабов+тестов, с provenance) со схемой master-OpenAPI поставщика, поле-в-поле. Симметрично `pinout-asyncapi`. Семантику использования закрывают компонентные тесты потребителя (стаб+consumed-contract из спеки поставщика) | 📋 проектируется | [codemonstersteam/pinout-openapi](https://github.com/codemonstersteam/pinout-openapi) |
-| **pinout-netlist** | Координатор связей: хранит граф consumer↔provider, версии и метаданные контрактов, принимает отчёты валидаторов, детектирует breaking-change во времени. Название — отсылка к netlist в PCB-дизайне | 📋 запланирован | [codemonstersteam/pinout-netlist](https://github.com/codemonstersteam/pinout-netlist) |
+| **pinout-openapi** | Валидатор синхронных контрактов (bi-directional): статическая сверка `consumed-contract` потребителя со схемой master-OpenAPI поставщика, поле-в-поле (R1–R4). Отчёт — канон 1.1 (владелец канона `docs/report-format.md`) | ✅ работает | [codemonstersteam/pinout-openapi](https://github.com/codemonstersteam/pinout-openapi) |
+| **pinout-netlist** | Координатор связей: граф consumer↔provider (рёбра по субъектам из отчётов канона 1.1), история версий, impact-запрос «кто сломается» (oasdiff), свежесть provenance. HTTP-сервис; MVP доказан полигоном E2E тройки | ✅ MVP (sync impact; async — backlog) | [codemonstersteam/pinout-netlist](https://github.com/codemonstersteam/pinout-netlist) |
 | **pinout-cli** | Единый CLI-фронт для всех валидаторов и работы с координатором | 📋 позже | — |
 
 ## Принципы
@@ -101,9 +101,10 @@ pinout опирается на эти библиотеки (`kin-openapi`, `oasd
 
 ## Roadmap
 
-1. **pinout-asyncapi** — стабилизация и подготовка к интеграции с netlist (структурированный отчёт + расширение протоколов).
-2. **pinout-openapi** — проектирование (skill `program-design`) и реализация (skill `program-implementation`) функции валидации соответствия контрактов; конфигурация симметрична `pinout-asyncapi`.
-3. **pinout-netlist** — модель данных графа сервисов, приём отчётов валидаторов, детект breaking-change, визуализация зависимостей.
+1. **pinout-asyncapi** — ✅ работает (отчёт 1.1, R1–R9); хвосты — разрешение внешних `$ref`/`allOf`, async-impact в netlist.
+2. **pinout-openapi** — ✅ работает (R1–R4, канон 1.1, PR #10).
+3. **pinout-netlist** — ✅ MVP (PR #2–#7): приём отчётов, граф, impact (sync), полигон E2E; дальше — визуализация, async-impact.
+4. **pinout-cli** (E3) — единый фронт; не начат.
 4. **pinout-cli** — единая точка входа для разработчиков и CI.
 
 Детальные бэклоги (верхнеуровневый по экосистеме и пер-сервисные) ведутся в `backlog.md` концепт-репозитория и в `docs/design/` каждого сервиса — заполняются после пруфа концепта.

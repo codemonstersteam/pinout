@@ -74,11 +74,8 @@ E0 pinout-asyncapi (forward, async) ─┼──► общий формат от
 > доказательство `EXPERIMENT.md`, 5/5): ядро — `requires ⊆ sends` (запрос) + `reads ⊆ provides` (ответ) + типы.
 > E1 переносит его на Go, а не переизобретает.
 
-- [ ] 🔴 **P0 долга — канон отчёта `docs/report-format.md`** (`1.1`). Владелец канона — pinout-openapi.
-  **БЛОКИРУЕТ E0 и E2.** Тикет-вход: `../pinout-openapi/debt/01-report-canon-doc.md`.
-  Разбор и решение (вариант A) — [`debt/report-canon-fork.md`](debt/report-canon-fork.md).
-- [ ] 🔴 **P1a долга — выход валидатора на `1.1`:** `report.schema.json` (+`validator`/`interaction`/`consumer.name`/`generated_at`/`errors[].subject`), шов часов, фикстуры компонентных тестов.
-  Тикет-вход: `../pinout-openapi/debt/02-report-schema-1.1.md`.
+- [x] **P0 долга — канон отчёта `docs/report-format.md`** (`1.1`) — ✅ написан и смержен (PR #8, 2026-07-25).
+- [x] **P1a долга — выход валидатора на `1.1`** — ✅ выполнено (PR #10, 2026-09-22): схема 1.1 + шов часов D10 + `errors[].subject` + компонентный сценарий вердикта.
 - [x] Парсер OpenAPI 3.x — **`kin-openapi`** (honest reuse): parse + `$ref`-резолв + валидация (`internal/validate/provider/loader.go`, ADR-0001).
 - [x] Конфиг (`api-specification/config.schema.json`: consumer, provider `spec_url|spec_path` = master, перечень операций), симметричный async.
 - [x] Вход **`consumed-contract`** потребителя (из E-harness); резолв операций у поставщика (нет → `OP_NOT_IN_PROVIDER`).
@@ -89,9 +86,7 @@ E0 pinout-asyncapi (forward, async) ─┼──► общий формат от
 
 ## E0 — pinout-asyncapi: forward-валидатор (async) + отчёт под netlist
 
-**Статус:** 📋 **greenfield** — репозиторий сброшен под харнес (`208c6ce`, clean slate), **Go-кода нет**.
-Дизайн-пакет заведён: `TASK.md`, `docs/concept.md`, песочница `sandbox/EMULATION.md` (17 сценариев),
-замороженные контракты `api-specification/{config,consumed-contract,report}.schema.json` (`x-frozen: 2026-07-25`).
+**Статус:** ✅ **реализован** (2026-09-22): валидатор R1–R9, отчёт канона 1.1, unit+BDD-компонентные тесты и CI зелёные, тег v0.0.1; docs-хвосты PR #7/#8/#9 закрыты.
 **Репозиторий:** `../pinout-asyncapi`. Строится сразу на согласованной модели (consumed-contract, провайдер-как-истина).
 
 > **Поправка к прежней записи.** Здесь стояло «✅ инструмент работает», «E0 = только слой отчёта, алгоритм
@@ -100,16 +95,17 @@ E0 pinout-asyncapi (forward, async) ─┼──► общий формат от
 > отчёта** (решение оператора), а под-эпик `E0-model` растворён: репозиторий строится на новой модели с нуля,
 > выравнивать нечего.
 
-**P1b долга — до старта харнес-прогона E0** (сейчас правится только спека; после старта та же правка задевает написанный код и тесты). Тикет-вход: `../pinout-asyncapi/debt/01-report-canon-1.1.md`:
-- [ ] 🔴 `api-specification/report.schema.json` → `1.1` зеркально sync-близнецу; `uncovered_channels` остаётся.
-- [ ] 🔴 Снять `x-canon-note` → ссылка на канон; актуализировать `docs/concept.md:330`, `TASK.md:102`, `TASK.md:198`.
-- [ ] 🔴 Проверить `consumer.name` в `config.schema.json`, добавить при отсутствии.
+**P1b долга — ✅ ВЫПОЛНЕНО 2026-07-25** (`pinout-asyncapi@rework-with-harnes`), успели до старта прогона E0, поэтому свелось к правке спеки. Разбор и детали: [`debt/report-canon-fork.md`](debt/report-canon-fork.md) → P1b. Тикет-вход удалён — поглощён постановкой асинка.
+- [x] 🔴 `api-specification/report.schema.json` → `1.1` зеркально sync-близнецу; `uncovered_channels` остаётся.
+- [x] 🔴 Снять `x-canon-note` → ссылка на канон; актуализировать `docs/concept.md` (D5), `TASK.md` (п. 8, внешние зависимости).
+- [x] 🔴 Проверить `consumer.name` в `config.schema.json` — уже был и required.
+- [x] 🔴 Сверх плана: ADR **D10** (шов часов для `generated_at`) и **D11** (`subject` у io/parse-ошибок) — обе формы обязаны совпасть у sync-близнеца в P1a.
 
-**E0 (реализация валидатора):** зависит от P0 долга (канон) и P1b.
-- [ ] Прогон харнеса izi по `TASK.md`: слайсы → use case → дизайн-пакет → тикеты → реализация.
-- [ ] Сверка каналов/сообщений: `consumed-contract` потребителя ↳ схема payload поставщика (send контравар. / receive ковар.), provenance, коды R1–R9.
-- [ ] Отчёт в формате `1.1` (`schema_version` совпал с openapi); CLI `validate <config>` + exit `0/1/2/3`.
-- [ ] README по скиллу `documentation` со ссылкой на канон отчёта.
+**E0 (реализация валидатора):** ✅ выполнено (PR #3–#6, 2026-07; хвосты PR #7–#9 — 2026-09-22).
+- [x] Прогон харнеса izi по `TASK.md`: слайсы → use case → дизайн-пакет → тикеты → реализация.
+- [x] Сверка каналов/сообщений: `consumed-contract` потребителя ↳ схема payload поставщика (send контравар. / receive ковар.), provenance, коды R1–R9.
+- [x] Отчёт в формате `1.1` (`schema_version` совпал с openapi); CLI `validate <config>` + exit `0/1/2/3`.
+- [x] README по скиллу `documentation` со ссылкой на канон отчёта.
 
 **DoD (E0):** async-валидатор реализован на согласованной модели; отчёт в каноне `1.1`, `schema_version` совпал с sync-близнецом; exit-коды симметричны; компонентные тесты и CI зелёные.
 
@@ -119,16 +115,13 @@ E0 pinout-asyncapi (forward, async) ─┼──► общий формат от
 **Цель:** граф consumer↔provider с версиями/provenance; приём отчётов валидаторов; **reverse** — «кого сломает изменение поставщика».
 **Репозиторий:** `../pinout-netlist`.
 
-**P2 долга — docs-only, сейчас бесплатно (кода нет, спека не заморожена, E2 не стартовал).** Тикет-вход: `../pinout-netlist/debt/01-report-canon-1.1.md`:
-- [ ] 🔴 Починить 8 битых ссылок на `report-format.md` (`README` ×2, `AGENTS`, `docs/design/intent.md`, `api-specification/openapi.yml:65`, `docs/design/backlog.md`, `docs/design/messages.md` ×2).
-- [ ] 🔴 Переписать `ValidatorReport` в `api-specification/openapi.yml` под канон `1.1` — сейчас он требует `verdicts[]`/`provider{}`, которых валидаторы не печатают.
-- [ ] 🔴 `docs/design/messages.md`: `VerdictRecord.At ← generated_at`, `Edge.Subject ← errors[].subject`, `Edge.Interaction ← interaction`, `Edge.Consumer ← consumer.name`.
-
-- [ ] Модель данных: сервис, спека+версия/коммит, ребро consumer→provider с **provenance** consumed-contract, запись вердикта.
-- [ ] Приём отчётов обоих валидаторов (общий формат).
-- [ ] **Reverse:** диф спеки поставщика v_old→v_new (**`oasdiff`**, honest reuse) → затронутые операции → по графу живущие потребители, чей `consumed-contract` задет.
-- [ ] Запрос «кто сломается, если поставщик так изменит контракт»; авто-перепроверка forward по provenance-свежести.
-- [ ] (Позже) визуализация графа.
+**P2 долга** — ✅ закрыт (PR #2 netlist, 2026-09-22): контракт под канон 1.1 + заморозка, 8 ссылок, messages.md.
+**E2 (реализация)** — ✅ MVP готов (2026-09-22, PR #2–#7 netlist): greenfield-конвейер, срезы 01 ingest / 02 graph / 03 impact (oasdiff + правила R2/R3), JSON-снапшот, CI (unit+component+polygon).
+- [x] Модель данных: сервис, спека+версия/коммит, ребро consumer→provider с **provenance** consumed-contract, запись вердикта.
+- [x] Приём отчётов обоих валидаторов (общий формат; полигоны это доказывают реальными бинарями).
+- [x] **Reverse:** диф спеки поставщика v_old→v_new (**`oasdiff`**, honest reuse) → затронутые операции → по графу живущие потребители, чей `consumed-contract` задет.
+- [x] Запрос «кто сломается, если поставщик так изменит контракт»; свежесть provenance (`captured_hash`, пометка `stale`).
+- [ ] (Позже) визуализация графа; impact для async-поставщиков (501, backlog netlist).
 
 **DoD:** netlist принимает отчёты обоих валидаторов, строит граф пар; `oasdiff`-диф двух версий поставщика помечает затронутых потребителей.
 
@@ -146,4 +139,4 @@ E0 pinout-asyncapi (forward, async) ─┼──► общий формат от
 - [x] Этап 0 — критический разбор идеи + **исправление модели** (bi-directional, consumed-contract) + концепт (`README.md`/`docs/CONCEPT.md`), пруф.
 - [x] Этап 1 — верхнеуровневый бэклог экосистемы (этот файл) на согласованной модели.
 - [x] Этап 2 — BR/TASK в компоненты: `pinout-openapi/TASK.md` ✅, `pinout-asyncapi/TASK.md` ✅; доработка скилла `component-tests` (E-harness) под модель — 📋 в работе.
-- [ ] Этап 3 — запуск независимых конвейеров разработки по компонентам (харнес izi), сходятся к связному pinout. E1 прошёл первый слайс; **E0/E2 ждут закрытия долга** [`debt/report-canon-fork.md`](debt/report-canon-fork.md).
+- [x] Этап 3 — запуск независимых конвейеров разработки по компонентам (харнес izi), сходятся к связному pinout. Долг канона закрыт (P0/P1a/P1b/P2); E0 и E2 реализованы; экосистема связно доказана полигоном E2E (7 сценариев, netlist PR #6). 2026-09-22.
